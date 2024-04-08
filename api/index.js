@@ -77,7 +77,7 @@ app.post(
 );
 
 // endpoint for logging in of the user
-app.port(
+app.post(
     "/login",
     [
         body("email").notEmpty().withMessage("Email Should Not Be Empty"),
