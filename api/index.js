@@ -25,10 +25,16 @@ mongoose
     });
 
 // endpoint for registration of the user
-app.post("/register", (req, res) => {
+app.post("/register", async (req, res) => {
     const { name, email, password, image } = req.body;
 
-    const user = User.findOne({ email });
+    const user = await User.findOne({ email });
+
+    console.log(user)
+
+    if (user) {
+        return res.status(400).json({ message: "The User Already Exist" });
+    }
 
     const newUser = new User({ name, email, password, image });
     newUser
