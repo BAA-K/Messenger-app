@@ -10,6 +10,7 @@ import React, { useState } from "react";
 import colors from "../misc/colors";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
+import { MAIN_API_APP } from "../misc/constants";
 
 const RegisterScreen = () => {
     const [email, setEmail] = useState("");
@@ -28,7 +29,7 @@ const RegisterScreen = () => {
         };
 
         axios
-            .post("http://localhost:800/register", user)
+            .post(`${MAIN_API_APP}/register`, user)
             .then((response) => {
                 console.log(response);
                 Alert.alert(

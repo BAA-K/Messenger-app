@@ -30,10 +30,6 @@ app.post("/register", (req, res) => {
 
     const user = User.findOne({ email });
 
-    if (user) {
-        return res.status(400).json({ message: "The User Already Exist" });
-    }
-
     const newUser = new User({ name, email, password, image });
     newUser
         .save()
