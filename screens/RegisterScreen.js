@@ -30,8 +30,7 @@ const RegisterScreen = () => {
 
         axios
             .post(`${MAIN_API_APP}/register`, user)
-            .then((response) => {
-                console.log(response);
+            .then(() => {
                 Alert.alert(
                     `Registration Successful`,
                     `You Have Been Registered Successfully `
@@ -43,11 +42,7 @@ const RegisterScreen = () => {
                 setImage("");
             })
             .catch((err) => {
-                Alert.alert(
-                    `Registration Error`,
-                    "An Error Occurred While Registering"
-                );
-
+                Alert.alert(`Registration Error`, "Maybe The Email Is Invalid");
                 console.log("registration failed", err);
             });
     };

@@ -8,12 +8,28 @@ import {
 import React, { useState } from "react";
 import colors from "../misc/colors";
 import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
+import { MAIN_API_APP } from "../misc/constants";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LoginScreen = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     const navigation = useNavigation();
+
+    const handleLogin = () => {
+        const user = {
+            email,
+            password,
+        };
+
+        axios.post(`${MAIN_API_APP}/login`, user).then((response) => {
+            const token = response.data.token;
+
+            AsyncStorage.setItem("authToken", token);
+        });
+    };
 
     return (
         <View
@@ -106,6 +122,7 @@ const LoginScreen = () => {
                     </View>
 
                     <Pressable
+                        onPress={handleLogin}
                         style={{
                             width: 200,
                             backgroundColor: colors.mainBlue,

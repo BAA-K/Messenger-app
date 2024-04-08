@@ -8,6 +8,8 @@ const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const User = require("./models/user");
 const Message = require("./models/message");
+const { body, validationResult } = require("express-validator");
+const bcrypt = require("bcryptjs");
 
 const app = express();
 const port = 8000;
@@ -25,29 +27,106 @@ mongoose
     });
 
 // endpoint for registration of the user
-app.post("/register", async (req, res) => {
-    const { name, email, password, image } = req.body;
+app.post(
+    "/register",
+    [
+        body("name")
+            .notEmpty()
+            .withMessage("The Name Is Required")
+            .isString()
+            .withMessage("Name Should Be String"),
+        body("email").notEmpty().withMessage("The Email Is Required").isEmail(),
+        body("password")
+            .notEmpty()
+            .withMessage("The Password Is Required")
+            .isLength({ min: 6 })
+            .withMessage("password Should Be At Less 6 Character"),
+        body("image").notEmpty().withMessage("The Image Should Not Be Empty"),
+    ],
+    async (req, res) => {
+        try {
+            const { body: data } = req;
+            const result = validationResult(req);
 
-    const user = await User.findOne({ email });
+            if (!result.isEmpty()) {
+                return res.status(400).send("Invalid Data");
+            }
 
-    console.log(user)
+            const user = await User.findOne({ email });
 
-    if (user) {
-        return res.status(400).json({ message: "The User Already Exist" });
-    }
+            if (user) {
+                return res
+                    .status(400)
+                    .json({ message: "The User Already Exist" });
+            }
 
-    const newUser = new User({ name, email, password, image });
-    newUser
-        .save()
-        .then(() => {
+            data.password = hashPassword(data.password);
+
+            const newUser = new User({ ...data });
+
+            newUser.save();
+
             res.status(200).json({ message: "User Registered Successfully" });
-        })
-        .catch((err) => {
+        } catch (err) {
             console.log(`Error Registering User`, err);
-            res.status(500).json({ message: "Error REgistering The User!" });
-        });
-});
+            res.status(500).json({
+                message: "Error Registering The User!",
+            });
+        }
+    }
+);
+
+// endpoint for logging in of the user
+app.port(
+    "/login",
+    [
+        body("email").notEmpty().withMessage("Email Should Not Be Empty"),
+        body("password").notEmpty().withMessage("Password Should Not Be Empty"),
+    ],
+    async (req, res) => {
+        try {
+            const { body: data } = req;
+            const result = validationResult(req);
+
+            if (!result.isEmpty()) {
+                return res.status(400).json({ message: "Invalid Data" });
+            }
+
+            const user = await User.findOne({ email });
+
+            if (!user)
+                return res.status(404).json({ message: "User Not Found" });
+
+            const isMatch = await bcrypt.compare(data.password, user.password);
+
+            if (!isMatch)
+                return res.status(401).json({ message: "Invalid Credentials" });
+
+            const token = createToken(user._id);
+
+            res.status(200).json({ token });
+        } catch (err) {}
+    }
+);
 
 app.listen(port, () => {
     console.log("Server Is Running On Port 8000");
 });
+
+function createToken(userId) {
+    const payload = {
+        userId,
+    };
+
+    const token = jwt.sign(payload, `${process.env.JWT_SECRET_KEY}`, {
+        expiresIn: "1h",
+    });
+
+    return token;
+}
+
+function hashPassword(password) {
+    const salt = bcrypt.genSaltSync(10);
+
+    return bcrypt.hashSync(password, salt);
+}
