@@ -5,7 +5,7 @@ import {
     TextInput,
     View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import colors from "../misc/colors";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
@@ -24,12 +24,33 @@ const LoginScreen = () => {
             password,
         };
 
-        axios.post(`${MAIN_API_APP}/login`, user).then((response) => {
-            const token = response.data.token;
+        axios
+            .post(`${MAIN_API_APP}/login`, user)
+            .then((response) => {
+                console.log(response);
+                const token = response.data.token;
 
-            AsyncStorage.setItem("authToken", token);
-        });
+                AsyncStorage.setItem("authToken", token);
+
+                navigation.navigate("Home");
+            })
+            .catch((err) => {
+                Alert.alert("Login Error", "Invalid Email Or Password");
+                console.log("Login Error", err);
+            });
     };
+
+    useEffect(() => {
+        const checkLoginStatus = async () => {
+            try {
+                const token = await AsyncStorage.getItem("authToken");
+
+                if (token) navigation.navigate("Home");
+            } catch (err) {
+                console.log("Error", err);
+            }
+        };
+    }, []);
 
     return (
         <View
