@@ -149,7 +149,7 @@ app.post("/friend-request", async (req, res) => {
     }
 });
 
-//endpoint to show all the friend-requests of a particular user
+// endpoint to show all the friend-requests of a particular user
 app.get("/friend-request/:userId", async (req, res) => {
     try {
         const { userId } = req.params;
@@ -165,6 +165,37 @@ app.get("/friend-request/:userId", async (req, res) => {
     } catch (err) {
         console.log("Error In Fetch Friend Requests", err);
         res.status(500).send({ message: "Internal Server Error" });
+    }
+});
+
+// endpoint to accept a friend-request of a particular person
+app.post("/friend-request/accept", async (req, res) => {
+    try {
+        const { senderId, recipientId } = req.body;
+
+        const sender = await User.findById(senderId);
+        const recipient = await User.findById(recipientId);
+
+        sender.friends.push(recipientId);
+        recipient.friends.push(senderId);
+
+        recipient.friendRequests = recipient.friendRequests.filter(
+            (request) => request.toString() !== senderId
+        );
+
+        sender.sentFriendRequest = recipient.sentFriendRequest.filter(
+            (request) => request.toString() !== recipientId
+        );
+
+        await sender.save();
+        await recipient.save();
+
+        res.status(200).json({
+            message: "Friend Request Accepted Successfully",
+        });
+    } catch (err) {
+        console.log("Error In Accept Friend Request", err);
+        res.status(500).json({ message: "Accept Friend Request Failed" });
     }
 });
 

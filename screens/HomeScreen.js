@@ -42,6 +42,7 @@ const HomeScreen = () => {
                     }}
                 >
                     <Ionicons
+                        onPress={() => navigation.navigate("Chats")}
                         name="chatbox-ellipses-outline"
                         size={24}
                         color={colors.black}
@@ -102,8 +103,6 @@ const HomeScreen = () => {
             </View>
         );
     }
-
-    console.log(users);
 
     return (
         <View>

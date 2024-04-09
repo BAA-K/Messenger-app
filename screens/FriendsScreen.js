@@ -2,6 +2,9 @@ import { View, Text } from "react-native";
 import React, { useEffect, useContext, useState } from "react";
 import { MAIN_API_APP } from "../misc/constants";
 import { UserType } from "../context/UseContext";
+import axios from "axios";
+import colors from "../misc/colors";
+import FriendRequest from "../components/FriendRequest";
 
 const FriendsScreen = () => {
     const { userId, setUserId } = useContext(UserType);
@@ -34,9 +37,43 @@ const FriendsScreen = () => {
         fetchFriendRequests();
     }, []);
 
+    if (!friendRequests.length) {
+        return (
+            <View
+                style={{
+                    backgroundColor: colors.mainBlue,
+                    marginVertical: 15,
+                    marginRight: "auto",
+                    marginLeft: "auto",
+                    paddingHorizontal: 15,
+                    paddingVertical: 5,
+                    borderRadius: 25,
+                }}
+            >
+                <Text
+                    style={{
+                        textAlign: "center",
+                        fontSize: 24,
+                        color: colors.white,
+                    }}
+                >
+                    There Is No Users Yet
+                </Text>
+            </View>
+        );
+    }
+
     return (
-        <View>
-            <Text>Hello From Friends List</Text>
+        <View style={{ padding: 10, marginHorizontal: 12 }}>
+            <Text>Your Friend Requests!</Text>
+            {friendRequests.map((item, index) => (
+                <FriendRequest
+                    key={index}
+                    item={item}
+                    friendRequests={friendRequests}
+                    setFriendRequests={setFriendRequests}
+                />
+            ))}
         </View>
     );
 };
