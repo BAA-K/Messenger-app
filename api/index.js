@@ -149,6 +149,25 @@ app.post("/friend-request", async (req, res) => {
     }
 });
 
+//endpoint to show all the friend-requests of a particular user
+app.get("/friend-request/:userId", async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        // fetch the user document based on the user id
+        const user = await User.findById(userId)
+            .populate("friendRequests", "name email image")
+            .lean();
+
+        const friendRequests = user.friendRequests;
+
+        res.json(friendRequests);
+    } catch (err) {
+        console.log("Error In Fetch Friend Requests", err);
+        res.status(500).send({ message: "Internal Server Error" });
+    }
+});
+
 app.listen(port, () => {
     console.log("Server Is Running On Port 8000");
 });

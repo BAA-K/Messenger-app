@@ -8,7 +8,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import { MAIN_API_APP } from "../misc/constants";
-import { decode, encode } from "base-64"; // Import the base-64 package
+import { decode, encode } from "base-64";
+import User from "../components/User";
 
 if (!global.btoa) {
     global.btoa = encode;
@@ -46,6 +47,7 @@ const HomeScreen = () => {
                         color={colors.black}
                     />
                     <MaterialIcons
+                        onPress={() => navigation.navigate("Friends")}
                         name="people-outline"
                         size={24}
                         color={colors.black}
@@ -101,12 +103,14 @@ const HomeScreen = () => {
         );
     }
 
+    console.log(users);
+
     return (
         <View>
             <View style={{ padding: 10 }}>
-                {users.map((item, index) => {
-                    <User key={index} item={item} />;
-                })}
+                {users.map((item, index) => (
+                    <User key={index} item={item} />
+                ))}
             </View>
         </View>
     );

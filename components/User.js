@@ -57,7 +57,7 @@ const User = ({ item }) => {
             <Pressable
                 onPress={() => sendFriendRequest(userId, item._id)}
                 style={{
-                    backgroundColor: "#5671189",
+                    backgroundColor: colors.mainBlue,
                     padding: 10,
                     borderRadius: 6,
                     width: 105,
