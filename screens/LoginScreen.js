@@ -28,7 +28,6 @@ const LoginScreen = () => {
         axios
             .post(`${MAIN_API_APP}/login`, user)
             .then((response) => {
-                console.log(response);
                 const token = response.data.token;
 
                 AsyncStorage.setItem("authToken", token);

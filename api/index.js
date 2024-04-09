@@ -106,11 +106,26 @@ app.post(
 
             res.status(200).json({ token });
         } catch (err) {
-            console.log("Error Login", err)
-            res.status(500).json({message: "Login Failed"})
+            console.log("Error Login", err);
+            res.status(500).json({ message: "Login Failed" });
         }
     }
 );
+
+// endpoint to access all the users except the use who's is currently logged in
+
+app.get("/users/:userId", (req, res) => {
+    const loggedInUserId = req.params.userId;
+
+    User.find({ _id: { $ne: loggedInUserId } }) //+ new => Not Equal
+        .then((users) => {
+            res.status(200).json(users);
+        })
+        .catch((err) => {
+            console.log("Error Find Users");
+            res.status(500).json({ message: "Fetch The Users Failed" });
+        });
+});
 
 app.listen(port, () => {
     console.log("Server Is Running On Port 8000");
