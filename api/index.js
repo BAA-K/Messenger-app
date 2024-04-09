@@ -52,7 +52,7 @@ app.post(
                 return res.status(400).send("Invalid Data");
             }
 
-            const user = await User.findOne({ email });
+            const user = await User.findOne({ email: data.email });
 
             if (user) {
                 return res

@@ -4,6 +4,7 @@ import {
     Text,
     TextInput,
     View,
+    Alert,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import colors from "../misc/colors";
@@ -50,6 +51,8 @@ const LoginScreen = () => {
                 console.log("Error", err);
             }
         };
+
+        checkLoginStatus();
     }, []);
 
     return (
