@@ -127,6 +127,28 @@ app.get("/users/:userId", (req, res) => {
         });
 });
 
+// end point to send a request to a user
+app.post("/friend-request", async (req, res) => {
+    const { currentUserId, selectedUserId } = req.body;
+
+    try {
+        //! Update The Recipients's FriendRequestsArray
+        await User.findByIdAndUpdate(selectedUserId, {
+            $push: { friendRequests: currentUserId },
+        });
+
+        //! Update The Sender's SentFriendRequests Array
+        await User.findByIdAndUpdate(currentUserId, {
+            $push: { sentFriendRequest: selectedUserId },
+        });
+
+        res.sendStatus(200);
+    } catch (err) {
+        console.log("Error Request Friend", err);
+        res.sendStatus(500);
+    }
+});
+
 app.listen(port, () => {
     console.log("Server Is Running On Port 8000");
 });

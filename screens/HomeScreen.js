@@ -5,9 +5,18 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import colors from "../misc/colors";
 import { UserType } from "../context/UseContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import jwt_decode from "jwt-decode";
-import { axios } from "axios";
+import { jwtDecode } from "jwt-decode";
+import axios from "axios";
 import { MAIN_API_APP } from "../misc/constants";
+import { decode, encode } from "base-64"; // Import the base-64 package
+
+if (!global.btoa) {
+    global.btoa = encode;
+}
+
+if (!global.atob) {
+    global.atob = decode;
+}
 
 const HomeScreen = () => {
     const { userId, setUserId } = useContext(UserType);
@@ -49,7 +58,7 @@ const HomeScreen = () => {
     useEffect(() => {
         const fetchUsers = async () => {
             const token = await AsyncStorage.getItem("authToken");
-            const decodeToken = jwt_decode(token);
+            const decodeToken = jwtDecode(token);
             const userId = decodeToken.userId;
             setUserId(userId);
 
@@ -66,17 +75,39 @@ const HomeScreen = () => {
         fetchUsers();
     }, []);
 
-    if (!users) {
+    if (!users.length) {
         return (
-            <View>
-                <Text>There Is No Users</Text>
+            <View
+                style={{
+                    backgroundColor: colors.mainBlue,
+                    marginVertical: 15,
+                    marginRight: "auto",
+                    marginLeft: "auto",
+                    paddingHorizontal: 15,
+                    paddingVertical: 5,
+                    borderRadius: 25,
+                }}
+            >
+                <Text
+                    style={{
+                        textAlign: "center",
+                        fontSize: 24,
+                        color: colors.white,
+                    }}
+                >
+                    There Is No Users Yet
+                </Text>
             </View>
         );
     }
 
     return (
         <View>
-            <Text>Hello From Home Screen</Text>
+            <View style={{ padding: 10 }}>
+                {users.map((item, index) => {
+                    <User key={index} item={item} />;
+                })}
+            </View>
         </View>
     );
 };
