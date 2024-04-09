@@ -33,7 +33,7 @@ const LoginScreen = () => {
 
                 AsyncStorage.setItem("authToken", token);
 
-                navigation.navigate("Home");
+                navigation.replace("Home"); //+ Replace Don't Let The User Get Back
             })
             .catch((err) => {
                 Alert.alert("Login Error", "Invalid Email Or Password");

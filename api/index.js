@@ -92,7 +92,7 @@ app.post(
                 return res.status(400).json({ message: "Invalid Data" });
             }
 
-            const user = await User.findOne({ email });
+            const user = await User.findOne({ email: data.email });
 
             if (!user)
                 return res.status(404).json({ message: "User Not Found" });
@@ -105,7 +105,10 @@ app.post(
             const token = createToken(user._id);
 
             res.status(200).json({ token });
-        } catch (err) {}
+        } catch (err) {
+            console.log("Error Login", err)
+            res.status(500).json({message: "Login Failed"})
+        }
     }
 );
 
