@@ -241,10 +241,12 @@ app.post("/messages", upload.single("imageFile"), async (req, res) => {
             senderId,
             recipientId,
             messageType,
-            messageText,
+            message: messageText,
             timeStamp: new Date(),
             imageUrl: messageType === "image",
         });
+
+        await newMessage.save();
 
         res.status(200).json({ message: "Message Send Successfully" });
     } catch (err) {
@@ -272,7 +274,7 @@ app.get("/messages/:senderId/:recipientId", async (req, res) => {
     try {
         const { senderId, recipientId } = req.params;
 
-        const message = await Message.findOne({
+        const message = await Message.find({
             $or: [
                 { senderId: senderId, recipientId: recipientId },
                 { senderId: recipientId, recipientId: senderId },

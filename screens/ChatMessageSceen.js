@@ -15,10 +15,12 @@ import { UserType } from "../context/UseContext";
 import { MAIN_API_APP } from "../misc/constants";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 
 const ChatMessageScreen = () => {
     const [showEmojiSelector, setShowEmojiSelector] = useState(false);
     const [message, setMessage] = useState("");
+    const [messages, setMessages] = useState([]);
     const [selectedImage, setSelectedImage] = useState("");
     const [recipientData, setRecipientData] = useState();
 
@@ -58,9 +60,46 @@ const ChatMessageScreen = () => {
             if (response.ok) {
                 setMessage("");
                 setSelectedImage("");
+
+                fetchMessages();
             }
         } catch (err) {
             console.log("Error In Sending The Message", err);
+        }
+    };
+
+    const fetchMessages = async () => {
+        try {
+            const response = await fetch(
+                `${MAIN_API_APP}/messages/${userId}/${recipientId}`
+            );
+            const data = await response.json();
+
+            if (response.ok) {
+                setMessages(data);
+            } else {
+                console.log("Error Showing Messages", response.status.message);
+            }
+        } catch (err) {
+            console.log("Error Fetching Messages", err);
+        }
+    };
+
+    const formatTime = (time) => {
+        const options = { hour: "numeric", minute: "numeric" };
+        return new Date(time).toLocaleString("en-US", options);
+    };
+
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            handleSend("image", result.uri);
         }
     };
 
@@ -111,6 +150,10 @@ const ChatMessageScreen = () => {
     }, [recipientData]);
 
     useEffect(() => {
+        fetchMessages();
+    }, []);
+
+    useEffect(() => {
         const fetchRecipientData = async () => {
             try {
                 const response = await fetch(
@@ -127,13 +170,118 @@ const ChatMessageScreen = () => {
         };
     }, []);
 
-    console.log(recipientData);
-
     return (
         <KeyboardAvoidingView
             style={{ flex: 1, backgroundColor: colors.screenBG }}
         >
-            <ScrollView></ScrollView>
+            <ScrollView>
+                {messages.map((item, index) => {
+                    if (item.messageType === "text") {
+                        return (
+                            <Pressable
+                                key={index}
+                                style={[
+                                    item?.senderId?._id === userId
+                                        ? {
+                                              alignSelf: "flex-end",
+                                              backgroundColor:
+                                                  colors.lightYellow,
+                                              padding: 8,
+                                              maxWidth: "60%",
+                                              borderRadius: 7,
+                                              margin: 10,
+                                          }
+                                        : {
+                                              alignSelf: "flex-start",
+                                              backgroundColor: colors.white,
+                                              padding: 8,
+                                              margin: 10,
+                                              maxWidth: "60%",
+                                              borderRadius: 7,
+                                          },
+                                ]}
+                            >
+                                <Text
+                                    style={{ fontSize: 13, textAlign: "left" }}
+                                >
+                                    {item?.message}
+                                </Text>
+
+                                <Text
+                                    style={{
+                                        textAlign: "right",
+                                        fontSize: 9,
+                                        color: colors.gray,
+                                        marginTop: 5,
+                                    }}
+                                >
+                                    {formatTime(item?.timeStamp)}
+                                </Text>
+                            </Pressable>
+                        );
+                    }
+
+                    if (item.messageType === "image") {
+                        const baseUrl = "Development/Projects/Messenger/api/files/";
+                        const imageUrl = item.imageUrl;
+                        const filename = imageUrl.split("/").pop();
+                        const source = { uri: baseUrl + filename };
+
+                        return (
+                            <Pressable
+                                key={index}
+                                style={[
+                                    item?.senderId?._id === userId
+                                        ? {
+                                              alignSelf: "flex-end",
+                                              backgroundColor:
+                                                  colors.lightYellow,
+                                              padding: 8,
+                                              maxWidth: "60%",
+                                              borderRadius: 7,
+                                              margin: 5,
+                                              color: colors.black,
+                                          }
+                                        : {
+                                              alignSelf: "flex-start",
+                                              backgroundColor: colors.white,
+                                              padding: 8,
+                                              margin: 5,
+                                              maxWidth: "60%",
+                                              borderRadius: 7,
+                                              color: colors.black,
+                                          },
+                                ]}
+                            >
+                                <View>
+                                    <Image
+                                        source={source}
+                                        style={{
+                                            width: 200,
+                                            height: 200,
+                                            borderRadius: 7,
+                                        }}
+                                    />
+
+                                    <Text
+                                        style={{
+                                            textAlign: "right",
+                                            fontSize: 9,
+                                            color: colors.white,
+                                            position: "absolute",
+                                            right: 10,
+                                            marginTop: 5,
+                                            bottom: 7,
+                                        }}
+                                    >
+                                        {formatTime(item?.timeStamp)}
+                                    </Text>
+                                </View>
+                            </Pressable>
+                        );
+                    }
+                })}
+            </ScrollView>
 
             <View
                 style={{
@@ -176,7 +324,12 @@ const ChatMessageScreen = () => {
                         marginHorizontal: 8,
                     }}
                 >
-                    <Entypo name="camera" size={24} color={colors.gray} />
+                    <Entypo
+                        onPress={pickImage}
+                        name="camera"
+                        size={24}
+                        color={colors.gray}
+                    />
 
                     <Feather name="mic" size={24} color={colors.gray} />
                 </View>
