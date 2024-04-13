@@ -16,6 +16,7 @@ import { MAIN_API_APP } from "../misc/constants";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import { useRoute } from "@react-navigation/native";
 
 const ChatMessageScreen = () => {
     const [showEmojiSelector, setShowEmojiSelector] = useState(false);
@@ -147,7 +148,7 @@ const ChatMessageScreen = () => {
                 </View>
             ),
         });
-    }, [recipientData]);
+    }, []);
 
     useEffect(() => {
         fetchMessages();
@@ -222,7 +223,8 @@ const ChatMessageScreen = () => {
                     }
 
                     if (item.messageType === "image") {
-                        const baseUrl = "Development/Projects/Messenger/api/files/";
+                        const baseUrl =
+                            "Development/Projects/Messenger/api/files/";
                         const imageUrl = item.imageUrl;
                         const filename = imageUrl.split("/").pop();
                         const source = { uri: baseUrl + filename };

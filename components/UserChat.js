@@ -36,7 +36,7 @@ const UserChat = ({ item }) => {
             />
 
             <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 15, fontWight: "500" }}>
+                <Text style={{ fontSize: 15, fontWeight: "500" }}>
                     {item?.name}
                 </Text>
                 <Text

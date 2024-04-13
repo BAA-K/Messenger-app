@@ -34,7 +34,7 @@ const ChatScreen = () => {
         <ScrollView showsVerticalScrollIndicator={false}>
             <Pressable>
                 {acceptedFriends.map((item, index) => (
-                    <UserChat index={index} item={item} />
+                    <UserChat key={index} item={item} />
                 ))}
             </Pressable>
         </ScrollView>
