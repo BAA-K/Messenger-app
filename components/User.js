@@ -1,11 +1,14 @@
 import { Pressable, Text, View, Image } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import colors from "../misc/colors";
 import { UserType } from "../context/UseContext";
 import { MAIN_API_APP } from "../misc/constants";
 
 const User = ({ item }) => {
     const [requestSent, setRequestSent] = useState(false);
+    const [friendsSent, setFriendsSent] = useState(false);
+    const [friendRequests, sentFriendRequests] = useState([]);
+    const [userFriends, setUserFriends] = useState([]);
 
     const { userId, setUserId } = useContext(UserType);
 
@@ -26,6 +29,45 @@ const User = ({ item }) => {
             console.log("Error", err);
         }
     };
+
+    useEffect(() => {
+        const fetchFriendRequests = async () => {
+            try {
+                const response = await fetch(
+                    `${MAIN_API_APP}/friend-requests/sent/${userId}`
+                );
+                const data = await response.json();
+
+                if (response.ok) {
+                    sentFriendRequests(data);
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        };
+
+        fetchFriendRequests();
+    }, []);
+
+    useEffect(() => {
+        const fetchUserFriends = async () => {
+            try {
+                const response = await fetch(
+                    `${MAIN_API_APP}/friends/${userId}`
+                );
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    setUserFriends(data);
+                }
+            } catch (err) {
+                console.log("Error", err);
+            }
+        };
+
+        fetchUserFriends();
+    }, []);
 
     return (
         <Pressable
@@ -54,25 +96,68 @@ const User = ({ item }) => {
                 </Text>
             </View>
 
-            <Pressable
-                onPress={() => sendFriendRequest(userId, item._id)}
-                style={{
-                    backgroundColor: colors.mainBlue,
-                    padding: 10,
-                    borderRadius: 6,
-                    width: 105,
-                }}
-            >
-                <Text
+            {userFriends.includes(item._id) ? (
+                <Pressable
+                    onPress={() => sendFriendRequest(userId, item._id)}
                     style={{
-                        textAlign: "center",
-                        color: colors.white,
-                        fontSize: 13,
+                        backgroundColor: colors.green,
+                        padding: 10,
+                        borderRadius: 6,
+                        width: 105,
                     }}
                 >
-                    Add Friend
-                </Text>
-            </Pressable>
+                    <Text
+                        style={{
+                            textAlign: "center",
+                            color: colors.white,
+                            fontSize: 13,
+                        }}
+                    >
+                        Friends
+                    </Text>
+                </Pressable>
+            ) : requestSent ||
+              friendRequests.some((friend) => friend._id === item._id) ? (
+                <Pressable
+                    onPress={() => sendFriendRequest(userId, item._id)}
+                    style={{
+                        backgroundColor: colors.gray,
+                        padding: 10,
+                        borderRadius: 6,
+                        width: 105,
+                    }}
+                >
+                    <Text
+                        style={{
+                            textAlign: "center",
+                            color: colors.white,
+                            fontSize: 13,
+                        }}
+                    >
+                        Request Sent
+                    </Text>
+                </Pressable>
+            ) : (
+                <Pressable
+                    onPress={() => sendFriendRequest(userId, item._id)}
+                    style={{
+                        backgroundColor: colors.mainBlue,
+                        padding: 10,
+                        borderRadius: 6,
+                        width: 105,
+                    }}
+                >
+                    <Text
+                        style={{
+                            textAlign: "center",
+                            color: colors.white,
+                            fontSize: 13,
+                        }}
+                    >
+                        Add Friend
+                    </Text>
+                </Pressable>
+            )}
         </Pressable>
     );
 };

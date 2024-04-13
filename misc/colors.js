@@ -6,5 +6,6 @@ export default colors = {
     lightGray: "#585858",
     white: "#fff",
     screenBG: "#f0f0f0",
-    lightYellow: "#dcf8c6"
+    lightYellow: "#dcf8c6",
+    green: "#82cd47",
 };

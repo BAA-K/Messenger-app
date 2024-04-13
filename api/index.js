@@ -243,7 +243,7 @@ app.post("/messages", upload.single("imageFile"), async (req, res) => {
             messageType,
             message: messageText,
             timeStamp: new Date(),
-            imageUrl: messageType === "image",
+            imageUrl: messageType === "image" ? req.file.path : null,
         });
 
         await newMessage.save();
@@ -282,6 +282,44 @@ app.get("/messages/:senderId/:recipientId", async (req, res) => {
         }).populate("senderId", "_id name");
 
         res.json(message);
+    } catch (err) {
+        console.log(err);
+        res.status(500), json({ error: "Internal Server Error" });
+    }
+});
+
+app.get("/friend-requests/send/:userId", async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const user = await User.findById(userId).populate(
+            "sentFriendRequest",
+            "name email image"
+        );
+
+        const sentFriendRequest = user.sentFriendRequest;
+
+        res.json(sentFriendRequest);
+    } catch (err) {
+        console.log(err);
+        res.status(500), json({ error: "Internal Server Error" });
+    }
+});
+
+app.get("/friends/:userId", (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        User.findById(userId)
+            .populate("friends")
+            .then((user) => {
+                if (!user) {
+                    return res.status(404).json({ message: "User not found" });
+                }
+
+                const friendIds = user.friends.map((friend) => friend._id);
+
+                res.status(200).json(friends);
+            });
     } catch (err) {
         console.log(err);
         res.status(500), json({ error: "Internal Server Error" });

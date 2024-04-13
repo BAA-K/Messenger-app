@@ -7,7 +7,13 @@ import {
     Pressable,
     Image,
 } from "react-native";
-import React, { useContext, useEffect, useLayoutEffect, useState } from "react";
+import React, {
+    useContext,
+    useEffect,
+    useLayoutEffect,
+    useRef,
+    useState,
+} from "react";
 import colors from "../misc/colors";
 import { Entypo, Feather } from "@expo/vector-icons";
 import EmojiSelector from "react-native-emoji-selector";
@@ -50,7 +56,7 @@ const ChatMessageScreen = () => {
                 });
             } else {
                 formData.append("messageType", "text");
-                formData.append("imageFile", message);
+                formData.append("messageText", message);
             }
 
             const response = await fetch(`${MAIN_API_APP}/messages`, {
@@ -104,6 +110,18 @@ const ChatMessageScreen = () => {
         }
     };
 
+    const scrollViewRef = useRef(null);
+
+    const handleContentSizeChange = () => {
+        scrollToBottom();
+    };
+
+    const scrollToBottom = () => {
+        if (scrollViewRef.current) {
+            scrollViewRef.current.scrollToEnd({ animated: false });
+        }
+    };
+
     useLayoutEffect(() => {
         navigation.setOptions({
             headerTitle: "",
@@ -119,7 +137,7 @@ const ChatMessageScreen = () => {
                         name="arrow-back"
                         size={24}
                         color={colors.black}
-                        onPress={navigation.goBack()}
+                        onPress={() => navigation.goBack()}
                     />
 
                     <View
@@ -148,7 +166,7 @@ const ChatMessageScreen = () => {
                 </View>
             ),
         });
-    }, []);
+    }, [recipientData]);
 
     useEffect(() => {
         fetchMessages();
@@ -171,11 +189,19 @@ const ChatMessageScreen = () => {
         };
     }, []);
 
+    useEffect(() => {
+        scrollToBottom();
+    }, []);
+
     return (
         <KeyboardAvoidingView
             style={{ flex: 1, backgroundColor: colors.screenBG }}
         >
-            <ScrollView>
+            <ScrollView
+                ref={scrollViewRef}
+                contentContainerStyle={{ flexGrow: 1 }}
+                onContentSizeChange={handleContentSizeChange}
+            >
                 {messages.map((item, index) => {
                     if (item.messageType === "text") {
                         return (
@@ -223,11 +249,9 @@ const ChatMessageScreen = () => {
                     }
 
                     if (item.messageType === "image") {
-                        const baseUrl =
-                            "Development/Projects/Messenger/api/files/";
                         const imageUrl = item.imageUrl;
                         const filename = imageUrl.split("/").pop();
-                        const source = { uri: baseUrl + filename };
+                        const source = { uri: filename };
 
                         return (
                             <Pressable
@@ -354,9 +378,7 @@ const ChatMessageScreen = () => {
 
             {showEmojiSelector && (
                 <EmojiSelector
-                    onPress={(emoji) =>
-                        setMessage((preMessage) => preMessage + emoji)
-                    }
+                    onPress={(emoji) => setMessage((preMessage) => preMessage)}
                     style={{ height: 250 }}
                 />
             )}
