@@ -34,7 +34,7 @@ const User = ({ item }) => {
         const fetchFriendRequests = async () => {
             try {
                 const response = await fetch(
-                    `${MAIN_API_APP}/friend-requests/sent/${userId}`
+                    `${MAIN_API_APP}/friend-requests/send/${userId}`
                 );
                 const data = await response.json();
 
@@ -55,9 +55,9 @@ const User = ({ item }) => {
                 const response = await fetch(
                     `${MAIN_API_APP}/friends/${userId}`
                 );
-
+                
                 const data = await response.json();
-
+                
                 if (response.ok) {
                     setUserFriends(data);
                 }
@@ -65,9 +65,12 @@ const User = ({ item }) => {
                 console.log("Error", err);
             }
         };
-
+        
         fetchUserFriends();
     }, []);
+    
+    console.log("user fr:", userFriends)
+    console.log("user Req:", friendRequests)
 
     return (
         <Pressable

@@ -318,7 +318,7 @@ app.get("/friends/:userId", (req, res) => {
 
                 const friendIds = user.friends.map((friend) => friend._id);
 
-                res.status(200).json(friends);
+                res.status(200).json(friendIds);
             });
     } catch (err) {
         console.log(err);
