@@ -55,9 +55,9 @@ const User = ({ item }) => {
                 const response = await fetch(
                     `${MAIN_API_APP}/friends/${userId}`
                 );
-                
+
                 const data = await response.json();
-                
+
                 if (response.ok) {
                     setUserFriends(data);
                 }
@@ -65,12 +65,9 @@ const User = ({ item }) => {
                 console.log("Error", err);
             }
         };
-        
+
         fetchUserFriends();
     }, []);
-    
-    console.log("user fr:", userFriends)
-    console.log("user Req:", friendRequests)
 
     return (
         <Pressable
@@ -101,7 +98,6 @@ const User = ({ item }) => {
 
             {userFriends.includes(item._id) ? (
                 <Pressable
-                    onPress={() => sendFriendRequest(userId, item._id)}
                     style={{
                         backgroundColor: colors.green,
                         padding: 10,
@@ -122,7 +118,6 @@ const User = ({ item }) => {
             ) : requestSent ||
               friendRequests.some((friend) => friend._id === item._id) ? (
                 <Pressable
-                    onPress={() => sendFriendRequest(userId, item._id)}
                     style={{
                         backgroundColor: colors.gray,
                         padding: 10,

@@ -42,6 +42,7 @@ const ChatMessageScreen = () => {
     };
 
     const handleSend = async (messageType, imageUri) => {
+        if (message === "") return;
         try {
             const formData = new FormData();
             formData.append("senderId", userId);
@@ -378,7 +379,7 @@ const ChatMessageScreen = () => {
 
             {showEmojiSelector && (
                 <EmojiSelector
-                    onPress={(emoji) => setMessage((preMessage) => preMessage)}
+                    onEmojiSelected={(emoji) => setMessage((preMessage) => preMessage + emoji)}
                     style={{ height: 250 }}
                 />
             )}
