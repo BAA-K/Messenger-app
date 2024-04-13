@@ -1,8 +1,9 @@
-import { View, Text } from "react-native";
+import { View, Text, ScrollView, Pressable } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { UserType } from "../context/UseContext";
 import { useNavigation } from "@react-navigation/native";
 import { MAIN_API_APP } from "../misc/constants";
+import UserChat from "../components/UserChat";
 
 const ChatScreen = () => {
     const [acceptedFriends, setAcceptedFriends] = useState([]);
@@ -29,12 +30,14 @@ const ChatScreen = () => {
         acceptedFriendsList();
     });
 
-    console.log("friends", acceptedFriends);
-
     return (
-        <View>
-            <Text>Chat</Text>
-        </View>
+        <ScrollView showsVerticalScrollIndicator={false}>
+            <Pressable>
+                {acceptedFriends.map((item, index) => (
+                    <UserChat index={index} item={item} />
+                ))}
+            </Pressable>
+        </ScrollView>
     );
 };
 
