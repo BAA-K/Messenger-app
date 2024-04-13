@@ -176,6 +176,8 @@ app.post("/friend-request/accept", async (req, res) => {
         const sender = await User.findById(senderId);
         const recipient = await User.findById(recipientId);
 
+        console.log(senderId, recipientId);
+
         sender.friends.push(recipientId);
         recipient.friends.push(senderId);
 
@@ -196,6 +198,24 @@ app.post("/friend-request/accept", async (req, res) => {
     } catch (err) {
         console.log("Error In Accept Friend Request", err);
         res.status(500).json({ message: "Accept Friend Request Failed" });
+    }
+});
+
+// endpoint to access all the friends of the logged in user
+app.get("/accepted-friends/:userId", async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const user = await User.findById(userId).populate(
+            "friends",
+            "name email image"
+        );
+
+        const acceptedFriends = user.friends;
+
+        res.json(acceptedFriends);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: "Internal Server Error" });
     }
 });
 

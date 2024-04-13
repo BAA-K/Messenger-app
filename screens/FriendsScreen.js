@@ -57,11 +57,13 @@ const FriendsScreen = () => {
                         color: colors.white,
                     }}
                 >
-                    There Is No Users Yet
+                    There Is No Friend Request
                 </Text>
             </View>
         );
     }
+
+    console.log(friendRequests)
 
     return (
         <View style={{ padding: 10, marginHorizontal: 12 }}>

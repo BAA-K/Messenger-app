@@ -5,7 +5,7 @@ import { MAIN_API_APP } from "../misc/constants";
 import { UserType } from "../context/UseContext";
 import { useNavigation } from "@react-navigation/native";
 
-const FriendRequest = (item, friendRequests, setFriendRequests) => {
+const FriendRequest = ({item, friendRequests, setFriendRequests}) => {
     const { userId, setUserId } = useContext(UserType);
     const navigation = useNavigation();
 
@@ -59,9 +59,10 @@ const FriendRequest = (item, friendRequests, setFriendRequests) => {
                     fontWeight: "bold",
                     marginLeft: 10,
                     flex: 1,
+                    color: colors.black,
                 }}
             >
-                {item?.name} send you a friend request
+                {item?.name} send you a request
             </Text>
 
             <Pressable

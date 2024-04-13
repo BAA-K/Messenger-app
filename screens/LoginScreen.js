@@ -51,7 +51,7 @@ const LoginScreen = () => {
             }
         };
 
-        // checkLoginStatus();
+        checkLoginStatus();
     }, []);
 
     return (
